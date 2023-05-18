@@ -41,17 +41,21 @@ const leftPlayerKeyDown = 's';
 
 //LEFT PADDLE PARAMETERS
 const leftPaddleWidth = ref(10);
-const leftPaddleHeight = ref(800);
+const leftPaddleHeight = ref(400);
 
 const leftPaddleY = ref(gameContainerHeight/2 - leftPaddleHeight.value/2);
-const leftPaddleSpeed = ref(5);
+const leftPaddleSpeed = ref(12);
+
+const leftPaddleJustHit = ref(false);
 
 //RIGHT PADDLE PARAMETERS
 const rightPaddleWidth = ref(10);
-const rightPaddleHeight = ref(800);
+const rightPaddleHeight = ref(400);
 
 const rightPaddleY = ref(gameContainerHeight/2 - rightPaddleHeight.value/2);
-const rightPaddleSpeed = ref(5);
+const rightPaddleSpeed = ref(12);
+
+const rightPaddleJustHit = ref(false);
 
 //BALL PARAMETERS
 const ballSize = 10;
@@ -60,11 +64,14 @@ const paddleOffset = 10;
 const ballX = ref(gameContainerWidth/2 - ballSize/2);
 const ballY = ref(gameContainerHeight/2 - ballSize/2);
 
-const ballStartSpeedX = -2;
+const ballStartSpeedX = -4;
 const ballStartSpeedY = 2;
 
 const veloBallX = ref(0);
 const veloBallY = ref(0);
+
+const ballMaxSpeedX = 12;
+const ballMaxSpeedY = 10;
 
 
 const scoreA = ref(0);
@@ -128,8 +135,10 @@ const moovePaddles = () => {
 
 
 const ballWallColistion = () => {
-  if (ballY.value <= 0 || ballY.value >= gameContainerHeight - ballSize)
-    veloBallY.value *= -1;
+  if (ballY.value <= 0 )
+    veloBallY.value = Math.abs(veloBallY.value);
+  else if (ballY.value >= gameContainerHeight - ballSize)
+  veloBallY.value = -Math.abs(veloBallY.value);
 
   if (ballX.value <= 1)
     {
@@ -149,24 +158,33 @@ const ballWallColistion = () => {
     }
 }
 
-const ballPaddleColision = (paddleX: number, paddleY: number, paddleHeight:number, paddleCenterY:number , bounce: number, bounceFactor: number) => {
+const ballPaddleColision = (paddleX: number, paddleY: number, paddleHeight:number, sign: number) => {
 
-if (bounce * ballX.value <= paddleX)
+const newVelo = ref(0);
+if (sign * ballX.value <= paddleX)
 {
   if (ballY.value >= paddleY && ballY.value <= paddleY + paddleHeight)
   {
-    veloBallX.value = -veloBallX.value + (ballY.value - paddleCenterY) * (bounceFactor);
-    veloBallY.value = (ballY.value - paddleCenterY) * (bounceFactor);
+    veloBallX.value = sign * (Math.abs(veloBallX.value) + ((ballY.value - paddleY) / (paddleHeight / 2)));
+    if (veloBallX.value >= ballMaxSpeedX || veloBallX.value <= -ballMaxSpeedX)
+      veloBallX.value = ballMaxSpeedX * sign;
+    const Ysign = veloBallY.value / Math.abs(veloBallY.value);
+    const bounce = ref(25);
+    veloBallY.value = ( (ballY.value - (paddleY + paddleHeight/2)) / paddleHeight/2) * bounce.value;
+    return true;
   }
 }
+return false;
 }
 
 const gameLoop = () => {
 
 
 ballWallColistion();
-ballPaddleColision(paddleOffset + leftPaddleWidth.value, leftPaddleY.value,leftPaddleHeight.value, leftPaddleY.value + leftPaddleHeight.value/2, 1, -1);  
-ballPaddleColision( (paddleOffset + rightPaddleWidth.value + ballSize) - gameContainerWidth, rightPaddleY.value, rightPaddleHeight.value, rightPaddleY.value + rightPaddleHeight.value/2, -1, -1); 
+ballPaddleColision(paddleOffset + leftPaddleWidth.value, leftPaddleY.value,leftPaddleHeight.value, 1); 
+ballPaddleColision( (paddleOffset + rightPaddleWidth.value + ballSize) - gameContainerWidth, rightPaddleY.value, rightPaddleHeight.value, -1); 
+
+
 
 ballX.value += veloBallX.value;
 ballY.value += veloBallY.value;
