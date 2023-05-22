@@ -3,7 +3,7 @@
   
     <div class="info-container">
       <p>{{ "veloBall x-y " + retVeloBallX + " " + retVeloBallY }}</p>
-      <p >/p>
+      <p ></p>
       <p>{{ "Pong " + pong }}</p>
     </div>
   
@@ -16,14 +16,14 @@
 
     </div>
     <div class="scores">
-        <div class="scorePlayer" left="100%">{{ "Score A : " + scoreA }}</div>
-        <div class="scorePlayer" right="100%">{{ "Score B : " + scoreB }}</div>
+      <div class="scorePlayer" left="100%">{{ "Score A : " + scoreA }}</div>
+      <div class="scorePlayer" right="100%">{{ "Score B : " + scoreB }}</div>
     </div>
-    <div class="pong-container" >
-    </div>
+  </div>
+  <div class="pong-container" >
+    <canvas ref = "myCanvas" class="gameCanvasStyle" ></canvas>
 </div>
 
-<canvas ref = "myCanvas" class="gameCanvasStyle" ></canvas>
   </template>
   
   <style>
@@ -37,7 +37,7 @@
         width: 100%;
         height: 100%;
         background-color: #bbebfa;
-        border: 3px solid rgb(53, 51, 51);
+        border: solid rgb(82, 79, 79);
 
     }
     
@@ -48,18 +48,17 @@
     }
 
     .gameCanvasStyle {
-        z-index: 1;
+    z-index: 1;
     position: relative;
     display: flex;
     overflow: visible;
-    border: 3px solid rgb(156, 0, 0);
-    background-color: #1c9e32;
-    width: 900px;
-    height: 600px;
+    width: 100%;
+    height: 100%;
+    border: solid rgb(156, 0, 0);
+    background-color: #708a75;
+
     margin: auto; 
     
-    position: absolute;
-    z-index: 1; /* Ensure the block is positioned above the Pong game elements */
   }
   
   .info-container {
@@ -109,7 +108,7 @@
   display: relative;
   height: 40px;
   font-size: 24px;
-  color: #08225a;
+  color: #3b133b;
   }
   
   .scorePlayer {
@@ -444,7 +443,8 @@ function drawBall() {
   if (!ctx)
     return ;
   ctx.beginPath();
-  ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2);
+  console.log('drawBall' + '\nx = ' + ballX + '\ny = ' + ballY);
+  ctx.arc(ballX/3, ballY/4, ballSize/3, 0, Math.PI * 2);
   ctx.fillStyle = 'white';  // Or any color
   ctx.fill();
   ctx.closePath();
@@ -455,7 +455,7 @@ function drawPaddle(x:number, y:number, width:number, height:number) {
     return ;
   console.log('drawPaddle' + '\nx = ' + x + '\ny = ' + y + '\nwidth = ' + width + '\nheight = ' + height);
   ctx.beginPath();
-  ctx.rect(x, y, width, height);
+  ctx.rect(x/3, y/4, width/3, height/4);
   ctx.fillStyle = 'blue';  // Or any color
   ctx.fill();
   ctx.closePath();
@@ -471,11 +471,7 @@ function gameLoop() {
     ballColision();
     
     moovePaddles();
-    ctx.beginPath();
-    ctx.rect(0, 0, pongWidth, pongHeight);
-    ctx.fillStyle = 'grey';  // Or any color
-    ctx.fill();
-    ctx.closePath();
+  
     drawBall();
     drawPaddle(paddleOffset, leftPaddleY, leftPaddleWidth, leftPaddleHeight);
     console.log('paddleOffset = ' + paddleOffset + '\nleftPaddleY = ' + leftPaddleY + '\nleftPaddleWidth = ' + leftPaddleWidth + '\nleftPaddleHeight = ' + leftPaddleHeight + '\n-------\n');
